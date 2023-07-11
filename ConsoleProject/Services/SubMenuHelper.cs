@@ -36,15 +36,18 @@ namespace ConsoleProject.Services
                 switch (option)
                 {
                     case 1:
+                        MenuService.MenuAddProduct();
                         Console.WriteLine("Added product");
                         break;
                     case 2:
                         Console.WriteLine("Updated product");
                         break;
                     case 3:
+                        MenuService.MenuDeleteProduct();
                         Console.WriteLine("Deleted product");
                         break;
                     case 4:
+                        MenuService.MenuProducts();
                         Console.WriteLine("Showing all products");
                         break;
                     case 5:
