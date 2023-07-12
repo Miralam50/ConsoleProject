@@ -1,7 +1,10 @@
-﻿using ConsoleTables;
+﻿using ConsoleProject.Enums;
+using ConsoleProject.Models;
+using ConsoleTables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,6 +68,7 @@ namespace ConsoleProject.Services
             }
             catch (Exception ex)
             {
+                
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
             }
@@ -85,8 +89,26 @@ namespace ConsoleProject.Services
             {
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
-            }
-            #endregion
+            }  
         }
+
+        public static void MenuShowProductAccordingToCategory()
+        {
+            try
+            {
+                Console.WriteLine("Please, select category: ");
+                string selectedCategory = Console.ReadLine();
+                marketService.GetProductsAccordigToCategory(selectedCategory);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Oops! Got an error!");
+                Console.WriteLine(ex.Message);
+            }
+            
+               
+        }
+        #endregion
     }
 }

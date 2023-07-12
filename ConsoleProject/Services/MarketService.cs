@@ -16,9 +16,9 @@ namespace ConsoleProject.Services
         public List<SaleItem> SaleItems { get; set; }
         public MarketService()
         {
-                Products = new List<Product>();
-                Sales = new List<Sale>();
-                SaleItems = new List<SaleItem>();
+            Products = new List<Product>();
+            Sales = new List<Sale>();
+            SaleItems = new List<SaleItem>();
         }
 
         public List<Product> GetProducts()
@@ -46,7 +46,7 @@ namespace ConsoleProject.Services
 
             if (!isSuccessful)
             {
-                throw new InvalidDataException("Department not found!");
+                throw new InvalidDataException("Category not found!");
             }
 
             var newProduct = new Product
@@ -56,10 +56,10 @@ namespace ConsoleProject.Services
                 Category = (Category)parsedCategory,
                 Count = count,
             };
-            
+
             Products.Add(newProduct);
             return newProduct.ProductCode;
-         }
+        }
 
         public void DeleteProduct(int productCode)
         {
@@ -71,6 +71,16 @@ namespace ConsoleProject.Services
             Products = Products.Where(x => x.ProductCode != productCode).ToList();
         }
 
+        public List<Product> GetProductsAccordigToCategory(string categoryName)
+        {
+            Category selectedCategory;
+            if (Enum.TryParse(categoryName,out selectedCategory))
+            {
+
+            }
+           return Products = Products.Where(x => x.Category == categoryName).ToList();
+
+        }
        
     }
 }

@@ -51,6 +51,7 @@ namespace ConsoleProject.Services
                         Console.WriteLine("Showing all products");
                         break;
                     case 5:
+                        MenuService.MenuShowProductAccordingToCategory();
                         Console.WriteLine("Showing products according to their categories");
                         break;
                     case 6:
