@@ -1,4 +1,5 @@
-﻿using ConsoleProject.Enums;
+﻿using ConsoleProject.Base;
+using ConsoleProject.Enums;
 using ConsoleProject.Models;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace ConsoleProject.Services
         public List<SaleItem> SaleItems { get; set; }
         public MarketService()
         {
-            Products = new List<Product>();
-            Sales = new List<Sale>();
-            SaleItems = new List<SaleItem>();
+                Products = new List<Product>();
+                Sales = new List<Sale>();
+                SaleItems = new List<SaleItem>();
         }
 
         public List<Product> GetProducts()
@@ -56,10 +57,10 @@ namespace ConsoleProject.Services
                 Category = (Category)parsedCategory,
                 Count = count,
             };
-
+            
             Products.Add(newProduct);
             return newProduct.ProductCode;
-        }
+         }
 
         public void DeleteProduct(int productCode)
         {
@@ -71,16 +72,9 @@ namespace ConsoleProject.Services
             Products = Products.Where(x => x.ProductCode != productCode).ToList();
         }
 
-        public List<Product> GetProductsAccordigToCategory(string categoryName)
+        public List<Product> ShowProductAccordingToCategory()
         {
-            Category selectedCategory;
-            if (Enum.TryParse(categoryName,out selectedCategory))
-            {
-
-            }
-           return Products = Products.Where(x => x.Category == categoryName).ToList();
-
+           
         }
-       
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ConsoleProject.Enums;
-using ConsoleProject.Models;
 using ConsoleTables;
 using System;
 using System.Collections.Generic;
@@ -97,9 +96,15 @@ namespace ConsoleProject.Services
             try
             {
                 Console.WriteLine("Please, select category: ");
-                string selectedCategory = Console.ReadLine();
-                marketService.GetProductsAccordigToCategory(selectedCategory);
+                foreach (Category category in Enum.GetValues(typeof(Category)))
+                {
+                    Console.WriteLine(category);
+                }
 
+                string selectionCategory = Console.ReadLine();
+                Console.WriteLine($"Selected category:{selectionCategory}");
+                marketService.ShowProductAccordingToCategory(selectionCategory);
+               
             }
             catch (Exception ex)
             {
