@@ -40,6 +40,7 @@ namespace ConsoleProject.Services
                         Console.WriteLine("Added product");
                         break;
                     case 2:
+                        MenuService.UpdateProduct();
                         Console.WriteLine("Updated product");
                         break;
                     case 3:
@@ -55,9 +56,11 @@ namespace ConsoleProject.Services
                         Console.WriteLine("Showing products according to their categories");
                         break;
                     case 6:
+                        MenuService.MenuProductAccordingToPriceInterval();
                         Console.WriteLine("Showing products according to their price interval");
                         break;
                     case 7:
+                        MenuService.MenuProductAccordingToName();
                         Console.WriteLine("Finding products according to their name");
                         break;
                     case 0:

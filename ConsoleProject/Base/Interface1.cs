@@ -24,8 +24,5 @@ namespace ConsoleProject.Base
         List<Product> ShowProductByPrice();
         List <Product> ShowProductByName();
 
-
-
-
     }
 }

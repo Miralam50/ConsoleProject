@@ -11,5 +11,10 @@ namespace ConsoleProject.Models
         public int Number { get; set; }
         public Product Product { get; set; }
         public int Count { get; set; }
+
+        public static implicit operator SaleItem(List<SaleItem> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

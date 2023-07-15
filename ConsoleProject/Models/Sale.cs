@@ -12,5 +12,7 @@ namespace ConsoleProject.Models
         public decimal Amount { get; set; }
         public SaleItem SaleItem { get; set; }
         public DateTime SaleTime { get; set; }
+        public List<Product> Products { get; set; }
+        public DateTime Date { get; internal set; }
     }
 }

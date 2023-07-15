@@ -95,6 +95,7 @@ namespace ConsoleProject.Services
         {
             try
             {
+                
                 Console.WriteLine("Please, select category: ");
                 foreach (Category category in Enum.GetValues(typeof(Category)))
                 {
@@ -102,18 +103,153 @@ namespace ConsoleProject.Services
                 }
 
                 string selectionCategory = Console.ReadLine();
-                Console.WriteLine($"Selected category:{selectionCategory}");
-                marketService.ShowProductAccordingToCategory(selectionCategory);
-               
+                if (Enum.TryParse<Category>(selectionCategory, out Category slnCategory))
+                {
+                    Console.WriteLine($"Selected category: {selectionCategory}");
+                    var products = marketService.ShowProductAccordingToCategory(slnCategory);
+
+                    var table = new ConsoleTable("Name", "Price", "Category",
+                        "Count", "Product Code");
+
+                    if (products.Count == 0)
+                    {
+                        Console.WriteLine("No product's yet.");
+                        return;
+                    }
+
+                    foreach (var product in products)
+                    {
+                        table.AddRow(product.Name, product.Price, product.Category,
+                            product.Count, product.ProductCode);
+                    }
+
+                    table.Write();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid category selection.");
+                }
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
-            }
-            
-               
+            }   
         }
-        #endregion
+
+        public static void MenuProductAccordingToPriceInterval()
+{
+    try
+    {
+        Console.WriteLine("Enter lowest product's price:");
+        int lowestPrice = int.Parse(Console.ReadLine());
+
+       
+        Console.WriteLine("Enter highest product's price:");
+        int highestPrice = int.Parse(Console.ReadLine());
+
+        if (lowestPrice < 0 && highestPrice<0)
+        {
+            throw new Exception("Price may not be negative...");
+        }
+
+        var products = marketService.ShowProductAccordingToPrice(lowestPrice, highestPrice);
+        var table = new ConsoleTable("Name", "Price", "Category", "Count", "Product Code");
+
+        if (products.Count == 0)
+        {
+            Console.WriteLine("No products yet.");
+            return;
+        }
+
+        foreach (var product in products)
+        {
+            table.AddRow(product.Name, product.Price, product.Category, product.Count, product.ProductCode);
+        }
+
+        table.Write();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Oops! Got an error!");
+            Console.WriteLine(ex.Message);
+        }
+        }
+
+        public static void MenuProductAccordingToName()
+        {
+            try
+            {
+                Console.WriteLine("Enter product's name:");
+                var inputName = Console.ReadLine();
+                var products = marketService.ShowProductAccordingToName(inputName);
+                var table = new ConsoleTable("Name", "Price", "Category", "Count", "Product Code");
+
+                if (products.Count == 0)
+                {
+                    Console.WriteLine("No products yet.");
+                    return;
+                }
+
+                foreach (var product in products)
+                {
+                    table.AddRow(product.Name, product.Price, product.Category, product.Count, product.ProductCode);
+                }
+
+                table.Write();
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("Oops! Got an error!");
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public static void UpdateProduct()
+        {
+            try
+            {
+                Console.WriteLine("Enter the code:");
+                int code = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Enter the new name:");
+                string newName = Console.ReadLine();
+
+                Console.WriteLine("Enter the new quantity:");
+                int newQuantity = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Available categories:");
+                foreach (Category category in Enum.GetValues(typeof(Category)))
+                {
+                    Console.WriteLine($"{(int)category}. {category}");
+                }
+                Console.WriteLine("Enter the category (number) of the new product:");
+                int categoryNumber = int.Parse(Console.ReadLine());
+
+                if (!Enum.IsDefined(typeof(Category), categoryNumber))
+                {
+                    Console.WriteLine("Invalid category number!");
+                    return;
+                }
+                Category newCategory = (Category)categoryNumber;
+
+                Console.WriteLine("Enter the new price:");
+                decimal newPrice = decimal.Parse(Console.ReadLine());
+                marketService.UpdateProduct(code, newName, newQuantity, categoryNumber, newPrice);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while processing.Error message : {ex.Message} ");
+
+            }
+        }
     }
+    #endregion
+
+    #region Sales
+        
+    #endregion
 }
+

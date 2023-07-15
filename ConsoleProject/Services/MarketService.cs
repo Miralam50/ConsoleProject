@@ -4,6 +4,7 @@ using ConsoleProject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,9 +73,41 @@ namespace ConsoleProject.Services
             Products = Products.Where(x => x.ProductCode != productCode).ToList();
         }
 
-        public List<Product> ShowProductAccordingToCategory()
+        public List<Product> ShowProductAccordingToCategory(Category selectedCategory )
         {
-           
+            var data = Products.Where(x => x.Category == selectedCategory).ToList();
+
+            return data;
         }
+
+        public List<Product> ShowProductAccordingToPrice(int lowest, int highest)
+        {
+            var data = Products.Where(x => x.Price >= lowest && x.Price <= highest).ToList();
+            return data;
+        }
+
+        public List<Product> ShowProductAccordingToName(string inputname)
+        {
+            var data = Products.Where(x => x.Name == inputname).ToList();
+            return data;
+        }
+
+        public void UpdateProduct(int Id, string name, int count, object category, decimal price)
+        {
+            // Find the product to update
+            var Update = Products.FirstOrDefault(x => x.ProductCode == Id);
+            if (Update == null)
+                throw new Exception($"{Id} is invalid");
+            if (price < 0)
+                throw new FormatException("Price is lower than 0!");
+            if (count < 0)
+                throw new FormatException("Invalid count!");
+            Update.Name = name;
+            Update.Price = price;
+            Update.Count = count;
+
+        }
+
+
     }
 }
