@@ -2,6 +2,7 @@
 using ConsoleProject.Enums;
 using ConsoleProject.Models;
 using ConsoleTables;
+using System.Linq.Expressions;
 
 namespace ConsoleProject.Services
 {
@@ -12,6 +13,9 @@ namespace ConsoleProject.Services
 
         #region Product
 
+        /// <summary>
+        /// Showing products
+        /// </summary>
         public static void MenuProducts()
         {
             try
@@ -42,6 +46,9 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Adding new products
+        /// </summary>
         public static void MenuAddProduct()
         {
             try
@@ -51,6 +58,11 @@ namespace ConsoleProject.Services
 
                 Console.WriteLine("Enter product's price:");
                 decimal price = decimal.Parse(Console.ReadLine());
+
+                if (price <= 0)
+                {
+                    throw new Exception("Price must be positive");
+                }
 
                 Console.WriteLine("Enter product's category:");
                 foreach (var item in Enum.GetNames(typeof(Category)))
@@ -62,17 +74,23 @@ namespace ConsoleProject.Services
                 Console.WriteLine("Enter product's count:");
                 int count = int.Parse(Console.ReadLine());
 
+                if (count <= 0)
+                {
+                    throw new Exception("Count must be positive");
+                }
                 int Id = marketService.AddProduct(name, price, category, count);
                 Console.WriteLine($"Added product with product code: {Id}");
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
             }
         }
 
+        /// <summary>
+        /// Deleting existing products
+        /// </summary>
         public static void MenuDeleteProduct()
         {
             try
@@ -91,6 +109,9 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Showing products for category
+        /// </summary>
         public static void MenuShowProductAccordingToCategory()
         {
             try
@@ -138,6 +159,9 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Showing products for prices
+        /// </summary>
         public static void MenuProductAccordingToPriceInterval()
         {
             try
@@ -177,6 +201,9 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Showing products for names
+        /// </summary>
         public static void MenuProductAccordingToName()
         {
             try
@@ -207,6 +234,9 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Editing products properties
+        /// </summary>
         public static void UpdateProduct()
         {
             try
@@ -258,6 +288,9 @@ namespace ConsoleProject.Services
         #endregion
 
         #region Sales
+        /// <summary>
+        /// Adding new sales for user inputs
+        /// </summary>
         public static void MenuAddSales()
         {
             bool showProductMenu = true;
@@ -270,9 +303,19 @@ namespace ConsoleProject.Services
                 MenuService.MenuProducts();
                 var productCode = Int32.Parse(Console.ReadLine());
 
+                if(productCode < 0)
+                {
+                    throw new Exception("Product code must be positive");
+                }
+
                 Console.WriteLine("Enter product quantity : ");
 
                 var productQuantity = Int32.Parse(Console.ReadLine());
+
+                if (productQuantity <= 0)
+                {
+                    throw new Exception("Product quantity must be positive");
+                }
 
                 var currentProduct = marketService.Products.FirstOrDefault(e => e.Id == productCode);
 
@@ -302,6 +345,9 @@ namespace ConsoleProject.Services
 
         }
 
+        /// <summary>
+        /// Showing all existing sales
+        /// </summary>
         public static void MenuShowAllSales()
         {
             var table = new ConsoleTable("Number", "Amount",
@@ -323,6 +369,11 @@ namespace ConsoleProject.Services
             table.Write();
         }
 
+        /// <summary>
+        /// Showing existing sales for datetime
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
         public static void MenuShowAllSalesByTimeInterval(DateTime fromDate, DateTime toDate)
         {
             var table = new ConsoleTable("Id", "Amount",
@@ -344,6 +395,11 @@ namespace ConsoleProject.Services
             table.Write();
         }
 
+        /// <summary>
+        /// Showing existing sales for amount
+        /// </summary>
+        /// <param name="fromPrice"></param>
+        /// <param name="toPrice"></param>
         public static void MenuShowAllSalesByPriceInterval(decimal fromPrice, decimal toPrice)
         {
             var table = new ConsoleTable("Id", "Amount",
@@ -364,6 +420,10 @@ namespace ConsoleProject.Services
             table.Write();
         }
 
+        /// <summary>
+        /// Showing sales details for user
+        /// </summary>
+        /// <param name="saleId"></param>
         public static void ShowSaleDetailsById(int saleId)
         {
 
@@ -391,6 +451,10 @@ namespace ConsoleProject.Services
             table.Write();
         }
 
+        /// <summary>
+        /// Refunding products to stock and increasing products again
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public static void RefundProduct()
         {
             MenuShowAllSales();
@@ -398,11 +462,19 @@ namespace ConsoleProject.Services
             var currentSaleNumber = Int32.Parse(Console.ReadLine());
             var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == currentSaleNumber);
 
+            if (currentSaleNumber < 0)
+            {
+                throw new Exception("Sale number must be positive");
+            }
             if (currentSale is not null)
             {
                 ShowSaleDetailsById(currentSaleNumber);
                 Console.WriteLine("Choose Product Id for refund : ");
                 var currentProductId = Int32.Parse(Console.ReadLine());
+                if(currentProductId < 0)
+                {
+                    throw new Exception("Product Id must be positive");
+                }
                 var currentSaleItem = currentSale.SaleItems.FirstOrDefault(i => i.Id == currentProductId);
                 var currentProductQuantityInSale = currentSale.SaleItems.FirstOrDefault(i => i.Id == currentProductId).Count;
 
@@ -443,44 +515,89 @@ namespace ConsoleProject.Services
             //table.Write();
         }
 
+        /// <summary>
+        /// Removing sale and saleitems 
+        /// </summary>
         public static void RemoveSale()
         {
-            MenuShowAllSales();
-            Console.WriteLine("Choose sale number for remove : ");
-            var currentSaleNumber = Int32.Parse(Console.ReadLine());
-            var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == currentSaleNumber);
+            try
+            {
+                MenuShowAllSales();
+                Console.WriteLine("Choose sale number for remove : ");
+                var currentSaleNumber = Int32.Parse(Console.ReadLine());
+                if (currentSaleNumber < 0)
+                {
+                    throw new Exception("Sale number must be positive");
+                }
+                var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == currentSaleNumber);
 
-            marketService.Sales.Remove(currentSale);
+                marketService.Sales.Remove(currentSale);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while processing.Error message : {ex.Message} ");
+            }
+           
         }
 
+        /// <summary>
+        /// Showing sales for datetime
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public static void ShowSaleByTimeInterval()
         {
-            Console.WriteLine("Enter from date : (dd/mm/yyyy)");
-            var fromDate = DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Enter to date : (dd/mm/yyyy)");
-            var toDate = DateTime.Parse(Console.ReadLine());
-
-            if (toDate <= fromDate)
+            try
             {
-                throw new Exception("FromDate cannot be lower from ToDate");
+                Console.WriteLine("Enter from date : (dd/mm/yyyy)");
+                var fromDate = DateTime.Parse(Console.ReadLine());
+                Console.WriteLine("Enter to date : (dd/mm/yyyy)");
+                var toDate = DateTime.Parse(Console.ReadLine());
+
+                if (toDate <= fromDate)
+                {
+                    throw new Exception("FromDate cannot be lower from ToDate");
+                }
+
+                MenuShowAllSalesByTimeInterval(fromDate, toDate);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while processing.Error message : {ex.Message} ");
             }
 
-            MenuShowAllSalesByTimeInterval(fromDate, toDate);
         }
 
+        /// <summary>
+        /// Showing sales for price
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public static void ShowSaleByPriceInterval()
         {
-            Console.WriteLine("Enter from price : ");
-            var fromPrice = Decimal.Parse(Console.ReadLine());
-            Console.WriteLine("Enter to price : ");
-            var toPrice = Decimal.Parse(Console.ReadLine());
-
-            if (toPrice <= fromPrice)
+            try
             {
-                throw new Exception("FromPrice cannot be lower from ToPrice");
+                Console.WriteLine("Enter from price : ");
+                var fromPrice = Decimal.Parse(Console.ReadLine());
+                Console.WriteLine("Enter to price : ");
+                var toPrice = Decimal.Parse(Console.ReadLine());
+
+                if(fromPrice<=0 && toPrice <= 0)
+                {
+                    throw new Exception("Price must positive");
+                }
+                if (toPrice <= fromPrice)
+                {
+                    throw new Exception("FromPrice cannot be lower from ToPrice");
+                }
+
+                MenuShowAllSalesByPriceInterval(fromPrice, toPrice);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while processing.Error message : {ex.Message} ");
             }
 
-            MenuShowAllSalesByPriceInterval(fromPrice, toPrice);
         }
         #endregion
 

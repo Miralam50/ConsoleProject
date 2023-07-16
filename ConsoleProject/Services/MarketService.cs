@@ -43,6 +43,9 @@ namespace ConsoleProject.Services
             return this.Products;
         }
 
+        /// <summary>
+        /// Adding new products
+        /// </summary>
         public int AddProduct(string name, decimal price, string category, int count)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -78,6 +81,9 @@ namespace ConsoleProject.Services
             return newProduct.Id;
         }
 
+        /// <summary>
+        /// Deleting existing products
+        /// </summary>
         public void DeleteProduct(int Id)
         {
             var currentProduct = Products.FirstOrDefault(e => e.Id == Id);
@@ -92,6 +98,12 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Cheking product quantity have or not have
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
         public bool CheckProductQuantity(int productId,int quantity)
         {
             var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
@@ -107,6 +119,11 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Decreasing product quantity for sale
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="quantity"></param>
         public void DecreaseProductQuantity(int productId, int quantity)
         {
             var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
@@ -121,6 +138,11 @@ namespace ConsoleProject.Services
             }
         }
 
+        /// <summary>
+        /// Increasing product quantity for sale
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="quantity"></param>
         public void IncreaseProductQuantity(int productId, int quantity)
         {
             var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
@@ -135,26 +157,48 @@ namespace ConsoleProject.Services
             }
         }
 
-
-
+        /// <summary>
+        /// Showing product according to its category
+        /// </summary>
+        /// <param name="selectedCategory"></param>
+        /// <returns></returns>
         public List<Product> ShowProductAccordingToCategory(Category selectedCategory)
         {
             var data = Products.Where(x => x.Category == selectedCategory).ToList();
             return data;
         }
 
+        /// <summary>
+        /// Showing product according to its price
+        /// </summary>
+        /// <param name="lowest"></param>
+        /// <param name="highest"></param>
+        /// <returns></returns>
         public List<Product> ShowProductAccordingToPrice(int lowest, int highest)
         {
             var data = Products.Where(x => x.Price >= lowest && x.Price <= highest).ToList();
             return data;
         }
 
+        /// <summary>
+        /// Showing product according to its name
+        /// </summary>
+        /// <param name="inputname"></param>
+        /// <returns></returns>
         public List<Product> ShowProductAccordingToName(string inputname)
         {
             var data = Products.Where(x => x.Name == inputname).ToList();
             return data;
         }
 
+        /// <summary>
+        /// This metod editing products properties
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="name"></param>
+        /// <param name="count"></param>
+        /// <param name="category"></param>
+        /// <param name="price"></param>
         public void UpdateProduct(int Id, string name, int count, object category, decimal price)
         {
             // Find the product to update
@@ -172,6 +216,11 @@ namespace ConsoleProject.Services
 
         }
 
+        /// <summary>
+        /// That metod adding new sales
+        /// </summary>
+        /// <param name="sale"></param>
+        /// <exception cref="Exception"></exception>
         public void AddSale(Sale sale)
         {
             foreach (var saleItem in sale.SaleItems)
