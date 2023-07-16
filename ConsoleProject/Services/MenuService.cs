@@ -6,7 +6,7 @@ using ConsoleTables;
 namespace ConsoleProject.Services
 {
 
-    public class MenuService : IMenuService
+    public class MenuService
     {
         private static MarketService marketService = new();
 

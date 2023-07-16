@@ -1,9 +1,10 @@
-﻿using ConsoleProject.Enums;
+﻿using ConsoleProject.Base;
+using ConsoleProject.Enums;
 using ConsoleProject.Models;
 
 namespace ConsoleProject.Services
 {
-    public class MarketService
+    public class MarketService : IMarketService
     {
         public List<Product> Products { get; set; } = new List<Product>
         {
