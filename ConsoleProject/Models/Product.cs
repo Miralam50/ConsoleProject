@@ -1,10 +1,5 @@
 ﻿using ConsoleProject.Base;
 using ConsoleProject.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleProject.Models
 {
@@ -14,14 +9,24 @@ namespace ConsoleProject.Models
 
         public Product()
         {
-            ProductCode = _count;
+            Id = _count;
             _count++;
         }
+
+        public Product(string name, decimal price, Category category, int count, int Id)
+        {
+            Name = name;
+            Price = price;
+            Category = category;
+            Count = count;
+            Id = Id;
+        }
+
         public string Name { get; set; }
         public decimal Price { get; set; }
         public Category Category { get; set; }
         public int Count { get; set; }
-        public int ProductCode { get; set; }
+        public int Id { get; set; }
 
     }
 }

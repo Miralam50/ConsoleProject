@@ -8,6 +8,6 @@ namespace ConsoleProject.Base
 {
     public abstract class BaseEntity
     {
-        public int ProductCode { get; set; }
+        public int Id { get; set; }
     }
 }

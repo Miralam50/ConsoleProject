@@ -102,27 +102,36 @@ namespace ConsoleProject.Services
                 {
                     case 1:
                         Console.WriteLine("Added sale");
+                        MenuService.MenuAddSales();
                         break;
                     case 2:
-                        Console.WriteLine("Declined sale");
+                        Console.WriteLine("Refund sale");
+                        MenuService.RefundProduct();
                         break;
                     case 3:
                         Console.WriteLine("Removed sale");
+                        MenuService.RemoveSale();
                         break;
                     case 4:
                         Console.WriteLine("Showing all sales");
+                        MenuService.MenuShowAllSales();
                         break;
                     case 5:
                         Console.WriteLine("Showing sales according to their time interval");
+                        MenuService.ShowSaleByTimeInterval();
                         break;
                     case 6:
                         Console.WriteLine("Showing sales according to their price interval");
+                        MenuService.ShowSaleByPriceInterval();
                         break;
                     case 7:
                         Console.WriteLine("Showing sales on the given date");
                         break;
                     case 8:
                         Console.WriteLine("Show sales according to their numbers");
+                        MenuService.MenuShowAllSales();
+                        var currentSaleId = Int32.Parse(Console.ReadLine());
+                        MenuService.ShowSaleDetailsById(currentSaleId);
                         break;
                     case 0:
                         break;

@@ -1,16 +1,12 @@
-﻿using ConsoleProject.Enums;
+﻿using ConsoleProject.Base;
+using ConsoleProject.Enums;
+using ConsoleProject.Models;
 using ConsoleTables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleProject.Services
 {
 
-    public class MenuService
+    public class MenuService : IMenuService
     {
         private static MarketService marketService = new();
 
@@ -34,7 +30,7 @@ namespace ConsoleProject.Services
                 foreach (var product in products)
                 {
                     table.AddRow(product.Name, product.Price, product.Category,
-                        product.Count, product.ProductCode);
+                        product.Count, product.Id);
                 }
 
                 table.Write();
@@ -57,17 +53,21 @@ namespace ConsoleProject.Services
                 decimal price = decimal.Parse(Console.ReadLine());
 
                 Console.WriteLine("Enter product's category:");
-                string category = Console.ReadLine();
+                foreach (var item in Enum.GetNames(typeof(Category)))
+                {
+                    Console.WriteLine(item);
+                }
+                string category = Console.ReadLine().ToUpper();
 
                 Console.WriteLine("Enter product's count:");
                 int count = int.Parse(Console.ReadLine());
 
-                int productCode = marketService.AddProduct(name, price, category, count);
-                Console.WriteLine($"Added product with product code: {productCode}");
+                int Id = marketService.AddProduct(name, price, category, count);
+                Console.WriteLine($"Added product with product code: {Id}");
             }
             catch (Exception ex)
             {
-                
+
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
             }
@@ -78,24 +78,24 @@ namespace ConsoleProject.Services
             try
             {
                 Console.WriteLine("Enter product's code:");
-                int productCode = int.Parse(Console.ReadLine());
+                int Id = int.Parse(Console.ReadLine());
 
-                marketService.DeleteProduct(productCode);
+                Console.WriteLine($"Successfully deleted product with Number: {Id}");
+                marketService.DeleteProduct(Id);
 
-                Console.WriteLine($"Successfully deleted product with Number: {productCode}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
-            }  
+            }
         }
 
         public static void MenuShowProductAccordingToCategory()
         {
             try
             {
-                
+
                 Console.WriteLine("Please, select category: ");
                 foreach (Category category in Enum.GetValues(typeof(Category)))
                 {
@@ -120,7 +120,7 @@ namespace ConsoleProject.Services
                     foreach (var product in products)
                     {
                         table.AddRow(product.Name, product.Price, product.Category,
-                            product.Count, product.ProductCode);
+                            product.Count, product.Id);
                     }
 
                     table.Write();
@@ -135,46 +135,46 @@ namespace ConsoleProject.Services
             {
                 Console.WriteLine("Oops! Got an error!");
                 Console.WriteLine(ex.Message);
-            }   
+            }
         }
 
         public static void MenuProductAccordingToPriceInterval()
-{
-    try
-    {
-        Console.WriteLine("Enter lowest product's price:");
-        int lowestPrice = int.Parse(Console.ReadLine());
-
-       
-        Console.WriteLine("Enter highest product's price:");
-        int highestPrice = int.Parse(Console.ReadLine());
-
-        if (lowestPrice < 0 && highestPrice<0)
         {
-            throw new Exception("Price may not be negative...");
-        }
+            try
+            {
+                Console.WriteLine("Enter lowest product's price:");
+                int lowestPrice = int.Parse(Console.ReadLine());
 
-        var products = marketService.ShowProductAccordingToPrice(lowestPrice, highestPrice);
-        var table = new ConsoleTable("Name", "Price", "Category", "Count", "Product Code");
 
-        if (products.Count == 0)
-        {
-            Console.WriteLine("No products yet.");
-            return;
-        }
+                Console.WriteLine("Enter highest product's price:");
+                int highestPrice = int.Parse(Console.ReadLine());
 
-        foreach (var product in products)
-        {
-            table.AddRow(product.Name, product.Price, product.Category, product.Count, product.ProductCode);
-        }
+                if (lowestPrice < 0 && highestPrice < 0)
+                {
+                    throw new Exception("Price may not be negative...");
+                }
 
-        table.Write();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Oops! Got an error!");
-            Console.WriteLine(ex.Message);
-        }
+                var products = marketService.ShowProductAccordingToPrice(lowestPrice, highestPrice);
+                var table = new ConsoleTable("Name", "Price", "Category", "Count", "Product Code");
+
+                if (products.Count == 0)
+                {
+                    Console.WriteLine("No products yet.");
+                    return;
+                }
+
+                foreach (var product in products)
+                {
+                    table.AddRow(product.Name, product.Price, product.Category, product.Count, product.Id);
+                }
+
+                table.Write();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Oops! Got an error!");
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public static void MenuProductAccordingToName()
@@ -194,7 +194,7 @@ namespace ConsoleProject.Services
 
                 foreach (var product in products)
                 {
-                    table.AddRow(product.Name, product.Price, product.Category, product.Count, product.ProductCode);
+                    table.AddRow(product.Name, product.Price, product.Category, product.Count, product.Id);
                 }
 
                 table.Write();
@@ -219,6 +219,10 @@ namespace ConsoleProject.Services
 
                 Console.WriteLine("Enter the new quantity:");
                 int newQuantity = int.Parse(Console.ReadLine());
+                if (newQuantity < 0)
+                {
+                    throw new Exception("Please enter positive input");
+                }
 
                 Console.WriteLine("Available categories:");
                 foreach (Category category in Enum.GetValues(typeof(Category)))
@@ -227,6 +231,10 @@ namespace ConsoleProject.Services
                 }
                 Console.WriteLine("Enter the category (number) of the new product:");
                 int categoryNumber = int.Parse(Console.ReadLine());
+                if (categoryNumber < 0)
+                {
+                    throw new Exception("Please enter positive input");
+                }
 
                 if (!Enum.IsDefined(typeof(Category), categoryNumber))
                 {
@@ -245,11 +253,239 @@ namespace ConsoleProject.Services
 
             }
         }
-    }
-    #endregion
 
-    #region Sales
-        
-    #endregion
+
+        #endregion
+
+        #region Sales
+        public static void MenuAddSales()
+        {
+            bool showProductMenu = true;
+            List<SaleItem> saleItems = new List<SaleItem>();
+
+            while (showProductMenu)
+            {
+                Console.Clear();
+                Console.WriteLine("Choose product by product code : ");
+                MenuService.MenuProducts();
+                var productCode = Int32.Parse(Console.ReadLine());
+
+                Console.WriteLine("Enter product quantity : ");
+
+                var productQuantity = Int32.Parse(Console.ReadLine());
+
+                var currentProduct = marketService.Products.FirstOrDefault(e => e.Id == productCode);
+
+                var currentSaleItem = new SaleItem(currentProduct, productQuantity);
+
+                saleItems.Add(currentSaleItem);
+
+                Console.WriteLine("Do you want to continue? y/n");
+                var option = Console.ReadLine();
+                if (option.ToLower() != "y")
+                {
+                    showProductMenu = false;
+                }
+            }
+
+            var amountOfCurrentSaleItems = saleItems.Select(e => e.Product.Price * e.Count).Sum();
+
+            Sale sale = new Sale(amountOfCurrentSaleItems, saleItems);
+
+            marketService.AddSale(sale);
+
+
+            //Product product = new Product("kola", 4, Category.A, 3, 0);
+            //List<SaleItem> saleItems = new List<SaleItem>();
+            //SaleItem saleItem = new SaleItem(1, product, 2);
+            //saleItems.Add(saleItem);
+
+        }
+
+        public static void MenuShowAllSales()
+        {
+            var table = new ConsoleTable("Number", "Amount",
+                   "SaleTime");
+
+            var sales = marketService.Sales;
+
+            //if (sales.Count == 0)
+            //{
+            //    Console.WriteLine("No product's yet.");
+            //    return;
+            //}
+
+            foreach (var sale in sales)
+            {
+                table.AddRow(sale.Number, sale.Amount, sale.SaleTime);
+            }
+
+            table.Write();
+        }
+
+        public static void MenuShowAllSalesByTimeInterval(DateTime fromDate, DateTime toDate)
+        {
+            var table = new ConsoleTable("Id", "Amount",
+                   "SaleTime");
+
+            var sales = marketService.Sales.Where(i => i.SaleTime >= fromDate && i.SaleTime <= toDate).ToList();
+
+            if (sales.Count == 0)
+            {
+                Console.WriteLine("No sales found.");
+                return;
+            }
+
+            foreach (var sale in sales)
+            {
+                table.AddRow(sale.Number, sale.Amount, sale.SaleTime);
+            }
+
+            table.Write();
+        }
+
+        public static void MenuShowAllSalesByPriceInterval(decimal fromPrice, decimal toPrice)
+        {
+            var table = new ConsoleTable("Id", "Amount",
+                   "SaleTime");
+            var sales = marketService.Sales.Where(i => i.SaleItems.Select(e => e.Product.Price * e.Count).Sum() >= fromPrice && i.SaleItems.Select(e => e.Product.Price * e.Count).Sum() <= toPrice).ToList();
+
+            if (sales.Count == 0)
+            {
+                Console.WriteLine("No sales found.");
+                return;
+            }
+
+            foreach (var sale in sales)
+            {
+                table.AddRow(sale.Number, sale.Amount, sale.SaleTime);
+            }
+
+            table.Write();
+        }
+
+        public static void ShowSaleDetailsById(int saleId)
+        {
+
+            var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == saleId);
+
+            var currentSaleProducts = currentSale.SaleItems;
+
+            var table = new ConsoleTable("Id", "Name", "Price", "Category",
+                   "Quantity");
+
+            var sales = marketService.Sales;
+
+            if (currentSaleProducts.Count == 0)
+            {
+                Console.WriteLine("No product's yet.");
+                return;
+            }
+
+            foreach (var saleItem in currentSaleProducts)
+            {
+                table.AddRow(saleItem.Id, saleItem.Product.Name, saleItem.Product.Price, saleItem.Product.Category,
+                    saleItem.Count);
+            }
+
+            table.Write();
+        }
+
+        public static void RefundProduct()
+        {
+            MenuShowAllSales();
+            Console.WriteLine("Choose sale number for refund : ");
+            var currentSaleNumber = Int32.Parse(Console.ReadLine());
+            var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == currentSaleNumber);
+
+            if (currentSale is not null)
+            {
+                ShowSaleDetailsById(currentSaleNumber);
+                Console.WriteLine("Choose Product Id for refund : ");
+                var currentProductId = Int32.Parse(Console.ReadLine());
+                var currentSaleItem = currentSale.SaleItems.FirstOrDefault(i => i.Id == currentProductId);
+                var currentProductQuantityInSale = currentSale.SaleItems.FirstOrDefault(i => i.Id == currentProductId).Count;
+
+                Console.WriteLine($"Choose Product Quantity for refund : max({currentProductQuantityInSale})");
+                var currentProductQuantity = Int32.Parse(Console.ReadLine());
+                if (currentProductQuantityInSale < currentProductQuantity)
+                {
+                    throw new Exception("Cannot");
+                }
+                else
+                {
+                    currentSaleItem.Count -= currentProductQuantity;
+                    marketService.IncreaseProductQuantity(currentSaleItem.Product.Id, currentProductQuantity);
+                }
+
+            }
+
+
+            //var currentSaleProducts = currentSale.SaleItems;
+
+            //var table = new ConsoleTable("Name", "Price", "Category",
+            //       "Quantity");
+
+            //var sales = marketService.Sales;
+
+            //if (currentSaleProducts.Count == 0)
+            //{
+            //    Console.WriteLine("No product's yet.");
+            //    return;
+            //}
+
+            //foreach (var saleItem in currentSaleProducts)
+            //{
+            //    table.AddRow(saleItem.Product.Name, saleItem.Product.Price, saleItem.Product.Category,
+            //        saleItem.Count);
+            //}
+
+            //table.Write();
+        }
+
+        public static void RemoveSale()
+        {
+            MenuShowAllSales();
+            Console.WriteLine("Choose sale number for remove : ");
+            var currentSaleNumber = Int32.Parse(Console.ReadLine());
+            var currentSale = marketService.Sales.FirstOrDefault(e => e.Number == currentSaleNumber);
+
+            marketService.Sales.Remove(currentSale);
+        }
+
+        public static void ShowSaleByTimeInterval()
+        {
+            Console.WriteLine("Enter from date : (dd/mm/yyyy)");
+            var fromDate = DateTime.Parse(Console.ReadLine());
+            Console.WriteLine("Enter to date : (dd/mm/yyyy)");
+            var toDate = DateTime.Parse(Console.ReadLine());
+
+            if (toDate <= fromDate)
+            {
+                throw new Exception("FromDate cannot be lower from ToDate");
+            }
+
+            MenuShowAllSalesByTimeInterval(fromDate, toDate);
+        }
+
+        public static void ShowSaleByPriceInterval()
+        {
+            Console.WriteLine("Enter from price : ");
+            var fromPrice = Decimal.Parse(Console.ReadLine());
+            Console.WriteLine("Enter to price : ");
+            var toPrice = Decimal.Parse(Console.ReadLine());
+
+            if (toPrice <= fromPrice)
+            {
+                throw new Exception("FromPrice cannot be lower from ToPrice");
+            }
+
+            MenuShowAllSalesByPriceInterval(fromPrice, toPrice);
+        }
+        #endregion
+
+    }
 }
+
+
 

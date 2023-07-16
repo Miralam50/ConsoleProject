@@ -1,31 +1,45 @@
-﻿using ConsoleProject.Base;
-using ConsoleProject.Enums;
+﻿using ConsoleProject.Enums;
 using ConsoleProject.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleProject.Services
 {
     public class MarketService
     {
-        public List<Product> Products { get; set; }
-        public List<Sale> Sales { get; set; }
-        public List<SaleItem> SaleItems { get; set; }
+        public List<Product> Products { get; set; } = new List<Product>
+        {
+            new Product()
+            {
+                Category = Category.A,
+                Count = 10,
+                Name = "Cola 1LT",
+                Price = 1.4m
+            },
+            new Product()
+            {
+                Category = Category.A,
+                Count = 10,
+                Name = "Fanta 1LT",
+                Price = 1.4m
+            },
+            new Product()
+            {
+                Category = Category.A,
+                Count = 10,
+                Name = "Sprite 1LT",
+                Price = 1.4m
+            }
+        };
+        public List<Sale> Sales { get; set; } = new List<Sale>();
+        public List<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
+
         public MarketService()
         {
-                Products = new List<Product>();
-                Sales = new List<Sale>();
-                SaleItems = new List<SaleItem>();
+            
         }
 
         public List<Product> GetProducts()
         {
-            return Products;
+            return this.Products;
         }
 
         public int AddProduct(string name, decimal price, string category, int count)
@@ -58,25 +72,73 @@ namespace ConsoleProject.Services
                 Category = (Category)parsedCategory,
                 Count = count,
             };
-            
+
             Products.Add(newProduct);
-            return newProduct.ProductCode;
-         }
-
-        public void DeleteProduct(int productCode)
-        {
-            var existingProduct = Products.FirstOrDefault(x => x.ProductCode == productCode);
-
-            if (existingProduct == null)
-                throw new Exception($"Product with code {productCode} not found!");
-
-            Products = Products.Where(x => x.ProductCode != productCode).ToList();
+            return newProduct.Id;
         }
 
-        public List<Product> ShowProductAccordingToCategory(Category selectedCategory )
+        public void DeleteProduct(int Id)
+        {
+            var currentProduct = Products.FirstOrDefault(e => e.Id == Id);
+
+            if(currentProduct is not null)
+            {
+                Products.Remove(currentProduct);
+            }
+            else
+            {
+                //custom not found exception
+            }
+        }
+
+        public bool CheckProductQuantity(int productId,int quantity)
+        {
+            var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
+
+            if(currentProduct is not null)
+            {
+                return currentProduct.Count > quantity;
+            }
+            else
+            {
+                //return custom exception - NotInStockException
+                return false;
+            }
+        }
+
+        public void DecreaseProductQuantity(int productId, int quantity)
+        {
+            var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
+
+            if (currentProduct is not null)
+            {
+                currentProduct.Count -= quantity;
+            }
+            else
+            {
+                //return custom exception - NotInStockException
+            }
+        }
+
+        public void IncreaseProductQuantity(int productId, int quantity)
+        {
+            var currentProduct = Products.FirstOrDefault(e => e.Id == productId);
+
+            if (currentProduct is not null)
+            {
+                currentProduct.Count += quantity;
+            }
+            else
+            {
+                //return custom exception - NotInStockException
+            }
+        }
+
+
+
+        public List<Product> ShowProductAccordingToCategory(Category selectedCategory)
         {
             var data = Products.Where(x => x.Category == selectedCategory).ToList();
-
             return data;
         }
 
@@ -95,19 +157,42 @@ namespace ConsoleProject.Services
         public void UpdateProduct(int Id, string name, int count, object category, decimal price)
         {
             // Find the product to update
-            var Update = Products.FirstOrDefault(x => x.ProductCode == Id);
-            if (Update == null)
+            var update = Products.FirstOrDefault(x => x.Id == Id);
+            if (update == null)
                 throw new Exception($"{Id} is invalid");
             if (price < 0)
                 throw new FormatException("Price is lower than 0!");
             if (count < 0)
                 throw new FormatException("Invalid count!");
-            Update.Name = name;
-            Update.Price = price;
-            Update.Count = count;
+            update.Name = name;
+            update.Price = price;
+            update.Count = count;
+            update.Category = (Category)category;
 
         }
 
+        public void AddSale(Sale sale)
+        {
+            foreach (var saleItem in sale.SaleItems)
+            {
+                var tmp = CheckProductQuantity(saleItem.Product.Id, saleItem.Count);
+                if (!tmp)
+                {
+                    //new custom exception - NotEnoughInStcokException
+                    throw new Exception($"Not enough {saleItem.Count} {saleItem.Product.Name} in Stock");
+                }
+            }
+
+            Sales.Add(sale);
+
+            foreach (var saleItem in sale.SaleItems)
+            {
+                DecreaseProductQuantity(saleItem.Product.Id, saleItem.Count);
+            }
+
+        }
 
     }
 }
+
+
